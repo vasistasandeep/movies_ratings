@@ -1,0 +1,116 @@
+---
+title: "Movie Reviews"
+author: "Sandeep V"
+date: "October,12, 2017"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+library(rvest)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+## Frame
+- 5 graphs for movie rating xlsx
+- Correlation between audience and critic ratings evolved throughout year by genre
+## Acquire Data
+Getting data from Movies-ratings.xslx
+```{r}
+setwd("C:/Users/vasistas/Documents/From_Mydownloads/PGP-BDA/In_class/2nd_Residency/SVAP_Amit/Assignment/Subjective_quiz")
+movie_ratings=read.csv("Movie-Ratings.csv",header=TRUE)
+movie_ratings
+```
+##Refine
+- Remove unwanted data
+- Format data types
+- Missing data
+```{r}
+dim(movie_ratings)
+str(movie_ratings)
+column_name <- c('Film','Genre','Rot','Aud','Budget','Year')
+colnames(movie_ratings)<-column_name
+str(movie_ratings)
+```
+##Explore
+
+```{r}
+library(ggplot2)
+library(RColorBrewer)
+library(caTools)
+```
+```{r}
+summary(movie_ratings)
+#structure and data types will be provided by str functions
+str(movie_ratings)
+```
+```{r}
+ggplot(movie_ratings, aes(x=Genre, y=0)) + geom_jitter() + scale_y_continuous(limits = c(-2,2))
+# The above plot is known as stripchart which is a univariate plot
+# We can see Sction, comedy and Drama are dense while Romance and Adventure have less dense distribution of films
+```
+```{r}
+ggplot(movie_ratings, aes(x = Genre, y = Budget)) + geom_point()
+# if we observe the dataset movie_ratings we will get to know 
+# that the variable Genre is categorical in nature 
+# So we will need to tell ggplot2 that Genre is a categorical variable.
+# We can see Highest budget movie is action and Horror combines for least budget.
+```
+```{r}
+ggplot(movie_ratings, aes(x = Year, y = Rot, color = Aud)) + geom_point()
+# The above plot shows relationship between critic rating and Audience rating with Year realesed of the movie_ratings 
+# with varying critic rating of the movie rating Audience rating shown in different colors.
+```
+```{r}
+ggplot(movie_ratings, aes(x = Genre, y = Rot, size = Aud)) + geom_point()
+#This plot also same as above, but this Audience ratings of 
+#Movies is shown with varying sizes for Fenre type
+```
+
+```{r}
+ggplot(movie_ratings, aes(x = Budget, y = Rot)) +
+  geom_point() + geom_smooth()
+# Smoothing means to use algorithms to remove noise from a data set, 
+# allowing some important patterns to stand out. 
+# To add smoothing lines we would the geom geom_smooth() by default 
+# it uses LOESS smoothing which stands for Locally Weighted Scatterplot Smoothing
+```
+```{r}
+ggplot(movie_ratings, aes(x = Rot, y = Aud)) +
+  geom_point() + geom_smooth(method = "lm")
+# If we want to change the previous plot to use 
+# ordinary linear model smoothing we can use the method = "lm" argument.
+# The shaded portion in the above plots shows the 95% Confidence Intervals 
+# which also known as the standard error, we can remove this shaded portion 
+# using the argument se = FALSE
+```
+```{r}
+ggplot(movie_ratings, aes(x = Rot, y = Aud, col = factor(Year))) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE)
+# Sometimes in our data we might like to see patterns in the 
+# data based on some subgroups or categorical variables which 
+# can be shown using the aesthetic col
+# In the above ggplot command our smooth is calculated for each 
+# subgroup because there is an invisible aesthetic group which inherits from col. 
+```
+```{r}
+ggplot(movie_ratings, aes(x = Rot, y = Aud, col = factor(Year), fill = factor(Genre))) + 
+  geom_point(shape = 21, size = 5, alpha = .5)
+# The above plot is used whenever we need to distinguish the 
+# data points based on four categorical variables - Audience rating, Rotten tomatoes, Genre and Year
+```
